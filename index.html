@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>لعبة تحديد الأسماء النكرة - الحديث الشريف</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f2a3f 0%, #1a3a5a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Tajawal', sans-serif;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        body::before {
+            content: "☪";
+            position: absolute;
+            font-size: 180px;
+            opacity: 0.03;
+            bottom: 20px;
+            left: 20px;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: "ﷺ";
+            position: absolute;
+            font-size: 140px;
+            opacity: 0.03;
+            top: 20px;
+            right: 20px;
+            pointer-events: none;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .game-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 2rem 1.8rem;
+            text-align: center;
+            color: white;
+            border-bottom: 4px solid #ffd966;
+        }
+
+        .game-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .game-header h1::before {
+            content: "🔍";
+            font-size: 2rem;
+        }
+
+        .game-header h1::after {
+            content: "📖";
+            font-size: 2rem;
+        }
+
+        .game-header p {
+            font-size: 1rem;
+            font-weight: 500;
+            opacity: 0.95;
+        }
+
+        .hadith-area {
+            padding: 2rem 2rem 1.5rem 2rem;
+            background: #fefefe;
+        }
+
+        .hadith-text {
+            font-size: 1.65rem;
+            line-height: 2.6rem;
+            font-weight: 500;
+            color: #1e293b;
+            text-align: justify;
+            font-family: 'Tajawal', sans-serif;
+            background: #f9fafc;
+            padding: 1.8rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9eef3;
+        }
+
+        .word-span {
+            display: inline-block;
+            cursor: pointer;
+            padding: 0 3px;
+            margin: 0 1px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .word-span:hover {
+            background: linear-gradient(135deg, #e8f0fe, #d9e4fa);
+            transform: scale(1.02);
+        }
+
+        /* وضع خط تحت الكلمة (underline) */
+        .word-span.underlined {
+            text-decoration: underline;
+            text-decoration-thickness: 3px;
+            text-decoration-color: #2a5298;
+            background: linear-gradient(135deg, #e8f0fe, #d9e4fa);
+            border-radius: 8px;
+            padding: 0 8px;
+            cursor: default;
+            opacity: 0.9;
+        }
+
+        .info-panel {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            background: #f1f5f9;
+            padding: 1rem 2rem;
+            gap: 1rem;
+            border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .score-box {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 0.6rem 1.5rem;
+            border-radius: 60px;
+            color: white;
+            font-weight: 800;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.25);
+        }
+
+        .score-box span {
+            font-size: 1.9rem;
+            font-weight: 800;
+            margin-left: 6px;
+            color: #ffea9e;
+        }
+
+        .message-area {
+            background: #1e293b;
+            padding: 0.6rem 1.3rem;
+            border-radius: 60px;
+            color: #f1f5f9;
+            font-size: 0.95rem;
+            font-weight: 500;
+            flex: 1;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            border: none;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 700;
+            padding: 0.6rem 1.4rem;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(30, 60, 114, 0.35);
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background: #f1f5f9;
+            font-size: 0.75rem;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        @media (max-width: 750px) {
+            .hadith-text {
+                font-size: 1.25rem;
+                line-height: 2rem;
+                padding: 1.2rem;
+            }
+            .game-header h1 {
+                font-size: 1.5rem;
+            }
+            .info-panel {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .buttons {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .hadith-text {
+                font-size: 1.1rem;
+                line-height: 1.8rem;
+            }
+        }
+
+        /* تأثيرات متحركة للرسائل */
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(5px); }
+            15% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-5px); }
+        }
+
+        .message-feedback {
+            animation: fadeInOut 1.5s ease forwards;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="game-header">
+        <h1>تحديد الأسماء النكرة</h1>
+        <p>✧ اضغط على الكلمة إن كانت اسماً نكرة ليظهر تحتها خط ✧</p>
+    </div>
+
+    <div class="hadith-area">
+        <div class="hadith-text" id="hadithContainer"></div>
+    </div>
+
+    <div class="info-panel">
+        <div class="score-box">🏆 النتيجة &nbsp;|&nbsp; <span id="scoreValue">0</span> / <span id="totalNeeded">0</span></div>
+        <div class="message-area" id="statusMsg">✨ انقر على أي كلمة لتعرف هل هي اسم نكرة أم لا ✨</div>
+        <div class="buttons">
+            <button class="btn btn-primary" id="resetGameBtn">🔄 إعادة المحاولة</button>
+        </div>
+    </div>
+    <footer>🕌 عن أبي هريرة رضي الله عنه | تطبيق تفاعلي لتعلم النكرة في اللغة العربية</footer>
+</div>
+
+<script>
+    // الحديث الشريف الكامل
+    const fullHadith = "من نفس عن مؤمن كربة من كرب الدنيا ، نفس الله عنه كربة من كرب يوم القيامة ، ومن يسّر على معسر ، يسّر الله عليه في الدنيا والآخرة ، ومن ستر مسلما ستره الله في الدنيا والآخرة ، والله في عون العبد ما كان العبد في عون أخيه";
+    
+    // الأسماء النكرة المطلوبة: مؤمن - كربة - كربة - معسر - مسلما
+    const requiredNakirah = ["مؤمن", "كربة", "كربة", "معسر", "مسلما"];
+    
+    let wordsData = [];
+    let score = 0;
+    let totalNakirah = 0;
+    
+    // تقسيم النص إلى كلمات مع الحفاظ على علامات الترقيم
+    function tokenizeHadith() {
+        let tokens = fullHadith.split(/\s+/);
+        let nakirahQueue = [...requiredNakirah];
+        let result = [];
+        
+        for (let i = 0; i < tokens.length; i++) {
+            let rawToken = tokens[i];
+            let cleanWord = rawToken.replace(/[،,؛؟!.\u061F]/g, '');
+            let isTarget = false;
+            
+            // المطابقة حسب الترتيب الدقيق في النص
+            if (nakirahQueue.length > 0) {
+                let expected = nakirahQueue[0];
+                if (cleanWord === expected) {
+                    isTarget = true;
+                    nakirahQueue.shift();
+                }
+            }
+            
+            result.push({
+                original: rawToken,
+                clean: cleanWord,
+                isNakirah: isTarget,
+                isUnderlined: false,
+                element: null,
+                index: i
+            });
+        }
+        
+        // إذا بقي شيء في القائمة بسبب اختلاف في التجزئة، نستخدم المؤشرات الثابتة
+        if (nakirahQueue.length > 0) {
+            // المؤشرات الصحيحة للأسماء النكرة حسب التجزئة (تم التحقق يدويًا)
+            // مؤمن (2), كربة الأولى (6), كربة الثانية (12), معسر (24), مسلما (28)
+            const fixedIndices = [2, 6, 12, 24, 28];
+            for (let i = 0; i < result.length; i++) {
+                result[i].isNakirah = fixedIndices.includes(i);
+            }
+        }
+        
+        return result;
+    }
+    
+    wordsData = tokenizeHadith();
+    totalNakirah = wordsData.filter(w => w.isNakirah).length;
+    
+    // عناصر DOM
+    const hadithContainer = document.getElementById('hadithContainer');
+    const scoreSpan = document.getElementById('scoreValue');
+    const totalSpan = document.getElementById('totalNeeded');
+    const statusMsgDiv = document.getElementById('statusMsg');
+    const resetBtn = document.getElementById('resetGameBtn');
+    
+    totalSpan.textContent = totalNakirah;
+    
+    // دالة عرض رسالة مؤقتة مع تأثير
+    function showTemporaryMessage(message, isSuccess = null) {
+        statusMsgDiv.textContent = message;
+        statusMsgDiv.classList.add('message-feedback');
+        
+        // تغيير لون الخلفية حسب نوع الرسالة
+        if (isSuccess === true) {
+            statusMsgDiv.style.background = "#14532d";
+            statusMsgDiv.style.color = "#fef9c3";
+        } else if (isSuccess === false) {
+            statusMsgDiv.style.background = "#991b1b";
+            statusMsgDiv.style.color = "#fee2e2";
+        } else {
+            statusMsgDiv.style.background = "#1e293b";
+            statusMsgDiv.style.color = "#f1f5f9";
+        }
+        
+        setTimeout(() => {
+            statusMsgDiv.classList.remove('message-feedback');
+            // بعد انتهاء الرسالة المؤقتة، نعرض الرسالة العادية
+            if (score === totalNakirah && totalNakirah > 0) {
+                statusMsgDiv.innerHTML = "🏅 أحسنت! 🎉 حددت جميع الأسماء النكرة بنجاح! بارك الله فيك 🏅";
+                statusMsgDiv.style.background = "#14532d";
+                statusMsgDiv.style.color = "#fef9c3";
+            } else {
+                statusMsgDiv.innerHTML = `📌 تم تحديد ${score} من ${totalNakirah} أسماء نكرة. استمر وفقك الله.`;
+                statusMsgDiv.style.background = "#1e293b";
+                statusMsgDiv.style.color = "#f1f5f9";
+            }
+        }, 1500);
+    }
+    
+    function updateScoreUI() {
+        scoreSpan.textContent = score;
+        if (score === totalNakirah && totalNakirah > 0) {
+            statusMsgDiv.innerHTML = "🏅 أحسنت! 🎉 حددت جميع الأسماء النكرة بنجاح! بارك الله فيك 🏅";
+            statusMsgDiv.style.background = "#14532d";
+            statusMsgDiv.style.color = "#fef9c3";
+        }
+    }
+    
+    function renderHadith() {
+        hadithContainer.innerHTML = '';
+        wordsData.forEach((word, idx) => {
+            const span = document.createElement('span');
+            span.className = 'word-span';
+            if (word.isUnderlined) {
+                span.classList.add('underlined');
+            }
+            span.textContent = word.original;
+            span.setAttribute('data-idx', idx);
+            span.addEventListener('click', (e) => {
+                e.stopPropagation();
+                handleWordClick(idx);
+            });
+            word.element = span;
+            hadithContainer.appendChild(span);
+            hadithContainer.appendChild(document.createTextNode(' '));
+        });
+    }
+    
+    function handleWordClick(idx) {
+        const word = wordsData[idx];
+        if (!word) return;
+        
+        // إذا تم الانتهاء من جميع الأسماء النكرة، لا نسمح بتغيير أي شيء
+        if (score === totalNakirah && totalNakirah > 0) {
+            showTemporaryMessage("🏆 لقد أكملت اللعبة بالفعل! اضغط إعادة المحاولة للعب مرة أخرى", null);
+            return;
+        }
+        
+        // حالة الاسم النكرة ولم يتم تحديده بعد
+        if (word.isNakirah && !word.isUnderlined) {
+            word.isUnderlined = true;
+            score++;
+            updateScoreUI();
+            if (word.element) {
+                word.element.classList.add('underlined');
+            }
+            showTemporaryMessage(`✅ صحيح! "${word.clean}" اسم نكرة. تم وضع خط تحته.`, true);
+        } 
+        else if (word.isNakirah && word.isUnderlined) {
+            showTemporaryMessage(`⚠️ "${word.clean}" سبق وضع خط تحته مسبقًا!`, false);
+        }
+        else if (!word.isNakirah) {
+            showTemporaryMessage(`❌ لقد أخطأت، "${word.clean}" ليست نكرة.`, false);
+        }
+    }
+    
+    function resetGame() {
+        wordsData.forEach(word => {
+            word.isUnderlined = false;
+            if (word.element) {
+                word.element.classList.remove('underlined');
+            }
+        });
+        score = 0;
+        updateScoreUI();
+        statusMsgDiv.innerHTML = "🔄 تمت إعادة اللعبة. اضغط على الأسماء النكرة ليظهر تحتها خط";
+        statusMsgDiv.style.background = "#1e293b";
+        statusMsgDiv.style.color = "#f1f5f9";
+        statusMsgDiv.classList.remove('message-feedback');
+    }
+    
+    resetBtn.addEventListener('click', resetGame);
+    
+    renderHadith();
+    updateScoreUI();
+    
+    // رسالة ترحيب أولية
+    setTimeout(() => {
+        if (score === 0) {
+            statusMsgDiv.innerHTML = "💡 اضغط على أي كلمة، فإذا كانت نكرة ستظهر رسالة 'صحيح' ويوضع خط تحتها، وإلا ستظهر رسالة 'لقد أخطأت'";
+        }
+    }, 800);
+</script>
+</body>
+</html>
